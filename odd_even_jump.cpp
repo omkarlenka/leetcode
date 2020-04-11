@@ -13,76 +13,85 @@
 
 using namespace std;
 
-tuple<int,int> makeJump(int elem, multimap<int,int> &m, multimap<int, int>::iterator mp_itr, vector<vector<bool>> v)
+class PairComparator
+{
+public:
+    bool operator()(const pair<int,int> &a, const pair<int,int> &b) const
+    {
+        if(a.first < b.first)
+            return true;
+        else if(a.first == b.first)
+            return a.second < b.second;
+        
+        return false;
+    }
+};
+
+tuple<int,int> makeJump(int elem, map<pair<int, int>, pair<bool,bool>, PairComparator> &m, pair<int,int> key)
 {
     bool odd = false, even = false;
-    int index = -1;
+
+    map<pair<int, int>, pair<bool,bool>, PairComparator>::iterator mp_itr;
+    mp_itr = m.find(key);
     
-    multimap<int, int>::iterator itr1;
-    multimap<int, int>::iterator itr2;
     //Make Odd Jump
-    if(mp_itr != m.begin() && (prev(mp_itr)->first == elem))  //duplicate elemenet getting inserted again
+    if(next(mp_itr,1) != m.end())
     {
-        itr1 = m.lower_bound(elem);
-        index = itr1->second;
+        pair<int,int> next_key = (next(mp_itr,1))->first;
+        if(m[next_key].second)
+            odd = true;
+        //Try to make even jump here  for duplicate elements
+        if(next_key.first == elem)
+        {
+            if(m[next_key].first)
+                even = true;
+            
+            //delete the rightmost duplicate
+            m.erase(next_key);
+            
+            return (make_tuple(odd,even));
+        }
     }
-    else if(next(mp_itr,1) != m.end())
-    {
-        int next_elem  = (next(mp_itr,1))->first;
-        itr1 = m.lower_bound(next_elem);
-        itr2 = m.upper_bound(next_elem);
-        if(itr1->first == itr2->first)    //got a upper bound of the key
-            index = itr2->second;
-        else
-            index = itr1->second;
-    }
-    if(v[index][1])
-        odd = true;
     
     //Make Even Jump
     if(mp_itr != m.begin())
     {
-        int index = (prev(mp_itr,1))->second;
-        if(v[index][0])
+        pair<int,int> prev_key = (prev(mp_itr,1))->first;
+        if(m[prev_key].first)
             even = true;
     }
     return (make_tuple(odd,even));
 }
 
-int oddEvenJump(vector<int> &A)
+
+
+int oddEvenJumps(vector<int> &A)
 {
-    multimap<int, int> m;
-    multimap<int, int>::iterator mp_itr;
-    vector<vector<bool>> v(A.size());
-    int res = 0;
+    map<pair<int, int>, pair<bool,bool>,PairComparator> m;
     
-    for(int i =0;i<A.size();i++)
-    {
-        vector<bool> tmp(2,false);
-        v[i] = tmp;
-    }
+    int res = 0;
     
     vector<int>::iterator itr;
     for(itr = A.end()-1; itr >= A.begin();itr--)
     {
         int elem = *itr;
         int index = int(itr - A.begin());
-        mp_itr = m.insert({elem, index});
+        pair<int, int> key = make_pair(elem,  index);
         
         if(itr == A.end()-1)
         {
-            v[index][0] = true;
-            v[index][1] = true;
+            m[key] = make_pair(true, true);
             res++;
             continue;
         }
         
-        tuple<bool, bool> jumpRes = makeJump(elem, m, mp_itr, v);
+        m[key] = make_pair(false, false);
+        
+        tuple<bool, bool> jumpRes = makeJump(elem, m, key);
         bool odd = get<0>(jumpRes);
         bool even = get<1>(jumpRes);
         
-        v[index][0] = odd;
-        v[index][1] = even;
+        m[key] = make_pair(odd, even);
         if(odd)
             res++;
     }
