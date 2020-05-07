@@ -9,41 +9,24 @@
 #include <vector>
 
 using namespace std;
-class PairComparator
-{
-public:
-    bool operator()(const pair<int,  int>  &a,  const pair<int, int> &b)
-    {
-        return (a.first < b.first);
-    }
-};
-
 class Solution {
 public:
     vector<int> twoSum(vector<int>& nums, int target)
     {
-        vector<pair<int, int>> v;
-        for(int i = 0;i < nums.size();i++)
-            v.push_back(make_pair(nums[i], i));
-        
-        sort(v.begin(), v.end(), PairComparator());
-        
-        int l = 0, r = nums.size()-1;
+        multimap<int, int> M;
         vector<int> res(2);
         
-        while(l < r)
+        for(int i = 0;i < nums.size();i++)
         {
-            if(v[l].first + v[r].first == target)
+            multimap<int, int>::iterator itr;
+            itr = M.find(target - nums[i]);
+            if(itr != M.end())
             {
-                res[0] = v[l].second;
-                res[1] = v[r].second;
-                
+                res[0] = itr->second;
+                res[1] = i;
                 break;
             }
-            else if(v[l].first + v[r].first < target)
-                l++;
-            else
-                r--;
+            M.insert(pair<int, int> (nums[i], i));
         }
         return res;
     }
