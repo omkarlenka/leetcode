@@ -16,30 +16,24 @@ class Solution {
         int r = R.size(), j = 0;
         vector<pair<int, int>> M(l+r);
         int p = -1;
+        int count = 0;
         while(i < l && j < r)
         {
             if(L[i].first > R[j].first)
             {
                 M[++p] = R[j++];
-                res[L[i].second]++;
+                count++;
             }
             else
             {
-                if(i - 1 >= 0 && L[i].second < L[i-1].second)
-                    res[L[i].second] += res[L[i-1].second];
+                res[L[i].second] += count;
                 M[++p] = L[i++];
             }
         }
-        if(i < l)
-        {
-            if(i - 1 >= 0 && L[i].second < L[i-1].second)
-                res[L[i].second] += res[L[i-1].second];
-            M[++p] = L[i++];
-        }
+        
         while(i < l)
         {
-            if(L[i].second < L[i-1].second)
-                res[L[i].second] += res[L[i-1].second];
+            res[L[i].second] += count;
             M[++p] = L[i++];
         }
         while(j < r)
