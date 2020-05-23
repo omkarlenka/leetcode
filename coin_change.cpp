@@ -1,7 +1,7 @@
 //
 //  coin_change.cpp
 //
-//  Created by omlenka on 28/04/20.
+//  Created by omlenka on 23/05/20.
 //  Copyright © 2020 omkar lenka. All rights reserved.
 //
 
@@ -10,62 +10,27 @@
 
 using namespace std;
 
-int getLesserCoins(vector<int> &coins, int c)
-{
-    return lower_bound(coins.begin(), coins.end(), c)-coins.begin()-1;
-}
-
-int coinChange_Util(vector<int> &coins, int amount, vector<int> &v)
-{
-    if(amount <= 0)
-        return 0;
-    if(v[amount] == -1 || v[amount] != 0)
-        return v[amount];
+class Solution {
+public:
     
-    int c_index = getLesserCoins(coins, amount);
-    v[amount]  = -1;
-    while(c_index >=0)
+    int coinChange(vector<int>& coins, int amount)
     {
-        int res = 0;
-        int coin_value = coins[c_index];
-        if(v[coin_value] != -1)
+        vector<int> dp(amount+1, INT_MAX);
+        dp[0] = 0;
+        
+        for(int coin: coins)
         {
-            res = 1;
-            int res1 = coinChange_Util(coins, amount-coin_value, v);
-            if(res1 != -1)
+            for(int j = coin;j<=amount;j++)
             {
-                res += res1;
-                if(v[amount] == -1 || res < v[amount])
-                    v[amount] = res;
+                if(dp[j-coin] != INT_MAX)
+                    dp[j] = min(dp[j], 1+dp[j-coin]);
             }
         }
-        c_index--;
+        if(dp[amount] == INT_MAX)
+            return -1;
+        
+        return dp[amount];
     }
-    return v[amount];
-}
-int coinChange(vector<int>& coins, int amount)
-{
-    if(coins.size() == 0 || amount == 0)
-        return 0;
-    
-    sort(coins.begin(),coins.end());
-    
-    vector<int> v(amount+1, 0);
-    for(int c:coins)
-    {
-        if(c < v.size())
-            v[c] = 1;
-    }
-    
-    return coinChange_Util(coins, amount, v);
-}
+};
 
-int main()
-{
-    vector<int> v= {186,419,83,408};
-    cout << coinChange(v, 6249);
-    
-//    vector<int> v= {2};
-//    cout << coinChange(v, 1);
-    return 0;
-}
+
