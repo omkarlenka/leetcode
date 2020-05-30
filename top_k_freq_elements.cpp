@@ -40,12 +40,14 @@ public:
         
         priority_queue<pair<int,int>, vector<pair<int,int>>,Comparator> Q;
         unordered_map<int, int>::iterator itr;
+        int p = 0;
         
         for(itr = M.begin();itr != M.end();itr++)
         {
-            if(distance(M.begin(), itr) < k)
+            if(p < k)
             {
                 Q.push(make_pair(itr->first, itr->second));
+                p++;
             }
             else
             {
