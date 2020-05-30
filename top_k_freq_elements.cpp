@@ -7,16 +7,29 @@
 
 #include <iostream>
 #include <vector>
-#include <map>
+#include <unordered_map>
+#include <queue>
 
 using namespace std;
 
-class Solution {
+class Comparator
+{
 public:
+    bool operator()(pair<int,int> a, pair<int,int> b)
+    {
+        return (a.second > b.second);
+    }
+};
+class Solution {
+    
+public:
+    unordered_map<int,int> M;
+    
     vector<int> topKFrequent(vector<int>& nums, int k)
     {
-        map<int,int> M;
         
+        
+        //O(n)
         for(int n: nums)
         {
             if(M.find(n) == M.end())
@@ -24,35 +37,35 @@ public:
             else
                 M[n]++;
         }
-        map<int, int>::iterator itr;
-        map<int,vector<int>> freq_map;
+        
+        priority_queue<pair<int,int>, vector<pair<int,int>>,Comparator> Q;
+        unordered_map<int, int>::iterator itr;
+        
         for(itr = M.begin();itr != M.end();itr++)
         {
-            if(freq_map.find(itr->second) == freq_map.end())
+            if(distance(M.begin(), itr) < k)
             {
-                vector<int> v;
-                v.push_back(itr->first);
-                freq_map[itr->second] = v;
+                Q.push(make_pair(itr->first, itr->second));
             }
             else
             {
-                freq_map[itr->second].push_back(itr->first);
+                pair<int,int> t = Q.top();
+                if(itr->second > t.second)
+                {
+                    Q.pop();
+                    Q.push(make_pair(itr->first, itr->second));
+                }
             }
         }
         
-        // map<int,vector<int>>::reverse_itrerator ritr;
-        auto ritr = freq_map.rbegin() ;
         vector<int> res;
-        
-        while(k--)
+        while(!Q.empty())
         {
-            if(ritr->second.empty())
-            {
-                ritr++;
-            }
-            res.push_back(ritr->second[ritr->second.size()-1]);
-            ritr->second.pop_back();
+            pair<int,int> t = Q.top();
+            Q.pop();
+            res.push_back(t.first);
         }
+        
         
         return res;
     }
