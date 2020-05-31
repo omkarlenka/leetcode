@@ -69,7 +69,6 @@ public:
 class AutocompleteSystem {
     Trie *T;
     TrieNode* curr;
-    bool new_sentence;
     string prefix;
 public:
     AutocompleteSystem(vector<string>& sentences, vector<int>& times)
@@ -80,7 +79,6 @@ public:
             T->insert(T->root, sentences[i], times[i]);
         }
         curr = T->root;
-        new_sentence = false;
         prefix = "";
     }
     
@@ -108,25 +106,20 @@ public:
         vector<string> res;
         if(c == '#')
         {
-            if(new_sentence)
-                curr->hotness++;
+            curr->hotness++;
             curr = T->root;
-            new_sentence = false;
             prefix = "";
             return res;
         }
         if(curr->children.find(c) == curr->children.end())
         {
             T->insert(curr, string(1,c), 0);
-            new_sentence = true;
             curr = curr->children[c];
         }
         else
         {
             prefix += string(1,c);
             curr = curr->children[c];
-            if(curr->hotness)
-                curr->hotness++;
             
             TrieNode* n = curr;
             vector<pair<string,int>> v;
@@ -147,7 +140,6 @@ public:
  * AutocompleteSystem* obj = new AutocompleteSystem(sentences, times);
  * vector<string> param_1 = obj->input(c);
  */
-
 
 int main()
 {
