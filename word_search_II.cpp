@@ -25,33 +25,48 @@ class Solution {
         if(board[i][j] == word[index])
         {
             if(index == word.length()-1)
+            {
+                visited[i][j] = false;
                 return true;
+            }
             
             if(j-1 >= 0 && !visited[i][j-1])
             {
                 if(searchWord(board, word, index+1, visited, i, j-1, r, c))
+                {
+                    visited[i][j] = false;
                     return true;
+                };
             }
             if(j+1 < c && !visited[i][j+1])
             {
                 if(searchWord(board, word, index+1, visited, i, j+1, r, c))
+                {
+                    visited[i][j] = false;
                     return true;
+                }
             }
             if(i-1 >= 0 && !visited[i-1][j])
             {
                 if(searchWord(board, word, index+1, visited, i-1, j, r, c))
+                {
+                    visited[i][j] = false;
                     return true;
+                }
             }
             if(i+1 < r && !visited[i+1][j])
             {
                 if(searchWord(board, word, index+1, visited, i+1, j, r, c))
+                {
+                    visited[i][j] = false;
                     return true;
+                }
             }
         }
         visited[i][j] = false;
         return false;
     }
-    bool exist(vector<vector<char>>& board, string word)
+    unordered_set<string> exist(vector<vector<char>>& board, vector<string> words)
     {
         int r = board.size();
         int c = board[0].size();
@@ -59,28 +74,53 @@ class Solution {
         vector<bool> v(c, false);
         for(int k = 0;k < r;k++)
             visited[k] = v;
+        
+        unordered_map<char, vector<string>> M;
+        for(string word: words)
+        {
+            if(M.find(word[0]) == M.end())
+            {
+                vector<string> v;
+                v.push_back(word);
+                
+                M[word[0]] = v;
+            }
+            else
+            {
+                M[word[0]].push_back(word);
+            }
+        }
+        
+        unordered_set<string> res;
+        
         for(int i =0;i<r;i++)
         {
             for(int j = 0;j<c;j++)
             {
-                if(board[i][j] == word[0])
+                if(M.find(board[i][j]) != M.end())
                 {
-                    if(searchWord(board, word, 0, visited, i, j, r, c))
-                        return true;
+                    for(string w: M[board[i][j]])
+                    {
+                        if(res.find(w) == res.end())
+                        {
+                            if(searchWord(board, w, 0, visited, i, j, r, c, M))
+                            {
+                                res.insert(w);
+                            }
+                        }
+                    }
                 }
             }
         }
-        return false;
+        return res;
     }
 public:
     vector<string> findWords(vector<vector<char>>& board, vector<string>& words)
     {
-        vector<string> res;
-        for(string word:words)
-        {
-            if(exist(board, word))
-                res.push_back(word);
-        }
-        return res;
+        unordered_set<string> res = exist(board, words);
+        vector<string> v;
+        v.assign(res.begin(), res.end());
+        
+        return v;
     }
 };
