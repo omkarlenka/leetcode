@@ -12,18 +12,7 @@
 using namespace std;
 
 class Solution {
-    // void printDP(vector<vector<bool>> &v)
-    // {
-    //     int l = v.size();
-    //     for(int i = 0;i<l;i++)
-    //     {
-    //         for(int j = 0;j<l;j++)
-    //         {
-    //             cout << v[i][j] << " ";
-    //         }
-    //         cout << endl;
-    //     }
-    // }
+    
 public:
     bool wordBreak(string s, vector<string>& wordDict)
     {
@@ -34,36 +23,28 @@ public:
         }
         
         int l = s.length();
-        vector<vector<bool>> dp(l);
-        for(int i = 0;i<l;i++)
+        vector<bool> dp(l, false);
+        if(M.find(string(1,s[0])) != M.end())
+            dp[0] = true;
+        for(int i = 1;i<l;i++)
         {
-            vector<bool> v(l,false);
-            dp[i] = v;
-        }
-        
-        for(int i = l-1;i>=0;i--)
-        {
-            for(int j = i;j<l;j++)
+            if(M.find(s.substr(0,i+1)) != M.end())
             {
-                string sub = s.substr(i,j-i+1);
-                if(M.find(sub) != M.end())
+                dp[i] = true;
+            }
+            else
+            {
+                for(int j = 0;j<i;j++)
                 {
-                    dp[i][j] = 1;
-                }
-                else
-                {
-                    for(int k = 1;j-k>=i;k++)
+                    
+                    if(dp[j] && M.find(s.substr(j+1,i-j)) != M.end())
                     {
-                        if(dp[i][j-k] && dp[j-k+1][j])
-                        {
-                            dp[i][j] = true;
-                        }
+                        dp[i] = true;
+                        break;
                     }
                 }
-                
             }
         }
-        // printDP(dp);
-        return dp[0][l-1];
+        return dp[l-1];
     }
 };
