@@ -1,72 +1,44 @@
 //
-//  word_break.cpp
+//  group_anagrams.cpp
 //
-//  Created by omlenka on 06/06/20.
+//  Created by omlenka on 07/06/20.
 //  Copyright © 2020 omkar lenka. All rights reserved.
 //
 
 #include <iostream>
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 using namespace std;
 
-class Anagram
-{
-public:
-    bool isAnagram(string s1, string s2)
-    {
-        if(s1.length() != s2.length())
-            return false;
-        
-        vector<int> v(26,0);
-        for(char c: s1)
-        {
-            v[c-'a']++;
-        }
-        
-        for(char c: s2)
-        {
-            v[c-'a']--;
-        }
-        
-        for(int i:v)
-        {
-            if(i != 0)
-                return false;
-        }
-        
-        return true;
-    }
-};
-
 class Solution {
 public:
-    vector<vector<string>> groupAnagrams(vector<string>& s)
+    vector<vector<string>> groupAnagrams(vector<string>& str)
     {
         vector<vector<string>> res;
-        Anagram A;
-        int l = s.size();
-        vector<bool> visited(l,false);
-        
-        for(int i = 0;i<s.size();i++)
+        int i = -1;
+        vector<string> v(str);
+        for(int j = 0;j<v.size();j++)
         {
-            vector<string> v;
-            if(visited[i])
-                continue;
-            
-            v.push_back(s[i]);
-            
-            for(int j = i+1;j<s.size();j++)
+            sort(v[j].begin(), v[j].end());
+        }
+        
+        unordered_map<string, int> M;
+        for(int j = 0;j<v.size();j++)
+        {
+            if(M.find(v[j]) == M.end())
             {
-                if(!visited[i] && A.isAnagram(s[i],s[j]))
-                {
-                    v.push_back(s[j]);
-                    visited[j] = true;
-                }
+                i++;
+                M[v[j]] = i;
+                vector<string> p;
+                p.push_back(str[j]);
+                res.push_back(p);
             }
-            visited[i] = true;
-            res.push_back(v);
+            else
+            {
+                res[M[v[j]]].push_back(str[j]);
+            }
         }
         
         return res;
