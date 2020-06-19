@@ -6,21 +6,57 @@
 //
 
 class Solution {
+    void populateLps(string s, vector<int> &lps)
+    {
+        int i = 1, j  = 0;
+        while(i < s.length())
+        {
+            if(s[i] == s[j])
+            {
+                lps[i++] = ++j;
+            }
+            else
+            {
+                if(j == 0)
+                    i++;
+                else
+                    j = lps[j-1];
+            }
+        }
+    }
 public:
     int strStr(string haystack, string needle)
     {
         if(needle.empty())
             return 0;
-        int cur = 0;
-        do
+        if(needle.length() > haystack.length())
+            return -1;
+        
+        vector<int> lps(haystack.length(),0);
+        populateLps(needle, lps);
+        
+        int i = 0,j = 0;
+        
+        while(i < haystack.length())
         {
-            int i = haystack.find(needle[0],cur);
-            if(i == -1)
-                break;
-            if(haystack.substr(i,needle.length()) == needle)
-                return i;
-            cur =  i+1;
-        }while(cur < haystack.length());
+            if(haystack[i] == needle[j])
+            {
+                i++;
+                j++;
+            }
+            if(j == needle.length())
+            {
+                return (i - needle.length());
+            }
+            
+            if(haystack[i] != needle[j])
+            {
+                if(j == 0)
+                    i++;
+                else
+                    j= lps[j-1];
+            }
+        }
         return -1;
     }
 };
