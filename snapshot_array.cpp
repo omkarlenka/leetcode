@@ -7,65 +7,50 @@
 
 #include <iostream>
 #include <vector>
-#include <unordered_map>
-#include <set>
+#include <map>
 
-using namespace std;
 class SnapshotArray {
-    unordered_map<int, unordered_map<int, int>> M;
-    vector<int> v;
-    set<int> modified;
+    vector<map<int, int>> V;
     int snap_id;
 public:
     SnapshotArray(int length)
     {
-        v.resize(length, 0);
+        V.resize(length,map<int,int>());
         snap_id = 0;
     }
     ~SnapshotArray()
     {
-        v.clear();
-        M.clear();
-        modified.clear();
+        V.clear();
     }
     
     void set(int index, int val)
     {
-        v[index] = val;
-        modified.insert(index);
+        auto itr = V[index].find(snap_id);
+        if(itr == V[index].end())
+            V[index][snap_id] = val;
+        else
+            itr->second = val;
     }
     
     int snap()
     {
-        unordered_map<int,int> inner_M;
-        std::set<int>::iterator itr;
-        for(itr = modified.begin(); itr != modified.end();itr++)
-        {
-            inner_M[*itr] = v[*itr];
-            modified;
-        }
-        M[snap_id] = inner_M;
-        snap_id++;
-        return snap_id-1;
+        int tmp = snap_id++;
+        return tmp;
     }
     
     int get(int index, int snap_id)
     {
-        unordered_map<int, unordered_map<int, int>>::iterator itr = M.find(snap_id);
-        
-        if(itr != M.end())
+        auto itr = V[index].lower_bound(snap_id);
+        if(itr != V[index].end() && itr->first == snap_id)
         {
-            unordered_map<int,int>::iterator inner_itr;
-            inner_itr = itr->second.find(index);
-            if(inner_itr == itr->second.end())
-                return 0;
-            else
-            {
-                return inner_itr->second;
-            }
-            
+            return itr->second;
         }
-        return -1;
+        
+        if(itr == V[index].begin())
+            return 0;
+        
+        itr = prev(itr, 1);
+        return itr->second;
     }
 };
 
