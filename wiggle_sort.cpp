@@ -13,10 +13,12 @@ class Solution {
 public:
     void wiggleSort(vector<int>& nums)
     {
-        sort(nums.begin(), nums.end());
-        for(int i = 1;i<nums.size();i+=2)
+        int l = nums.size()-1;
+        for(int i = 0;i<l;i++)
         {
-            if(i != nums.size()-1)
+            if(i%2 == 0 && nums[i+1] < nums[i])
+                swap(nums[i], nums[i+1]);
+            else if(i%2 != 0 && nums[i+1] > nums[i])
                 swap(nums[i], nums[i+1]);
         }
     }
