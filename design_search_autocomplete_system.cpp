@@ -16,6 +16,8 @@ class TrieNode
 {
 public:
     unordered_map<char, TrieNode*> children;
+    //hotness will save the no. of times a sentence is typed
+    //and contains valid value only for the end letter of sentence
     int hotness;
     TrieNode()
     {
@@ -31,19 +33,19 @@ public:
     {
         root = new TrieNode();
     }
-    
+
     void insert(TrieNode* root,string s, int hotness)
     {
         for(int i = 0;i<s.length();i++)
         {
             char c = s[i];
-            
+
             if(root->children.find(c) == root->children.end())
             {
                 root->children[c] = new TrieNode();
             }
             root = root->children[c];
-            
+
             if(i == s.length() - 1)
             {
                 root->hotness = hotness;
@@ -61,7 +63,7 @@ public:
             return true;
         else if(a.second == b.second && a.first < b.first)
             return true;
-        
+
         return false;
     }
 };
@@ -81,7 +83,7 @@ public:
         curr = T->root;
         prefix = "";
     }
-    
+
     void autoComplete(TrieNode* n, string prefix, vector<pair<string,int>> &v)
     {
         if(n->hotness)
@@ -93,14 +95,14 @@ public:
                 v.pop_back();
             }
         }
-        
+
         unordered_map<char, TrieNode*>::iterator itr;
         for(itr = n->children.begin(); itr != n->children.end(); itr++)
         {
             autoComplete(itr->second, prefix+string(1, itr->first), v);
         }
     }
-    
+
     vector<string> input(char c)
     {
         vector<string> res;
@@ -120,7 +122,7 @@ public:
         {
             prefix += string(1,c);
             curr = curr->children[c];
-            
+
             TrieNode* n = curr;
             vector<pair<string,int>> v;
             autoComplete(curr, prefix, v);
@@ -130,7 +132,7 @@ public:
                 res.push_back(v[i].first);
             }
         }
-        
+
         return res;
     }
 };
