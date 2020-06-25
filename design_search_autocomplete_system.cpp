@@ -48,7 +48,7 @@ public:
 
             if(i == s.length() - 1)
             {
-                root->hotness = hotness;
+                root->hotness = hotness;  //hotness is updated for last letter
             }
         }
     }
@@ -70,14 +70,15 @@ public:
 
 class AutocompleteSystem {
     Trie *T;
-    TrieNode* curr;
-    string prefix;
+    TrieNode* curr; //current root of trie from where search will begin with every input
+    string prefix;  //prefix from T->root to curr
 public:
     AutocompleteSystem(vector<string>& sentences, vector<int>& times)
     {
         T = new Trie();
         for(int i = 0; i < sentences.size();i++)
         {
+            //Insert all the sentences to trie along with hotness
             T->insert(T->root, sentences[i], times[i]);
         }
         curr = T->root;
