@@ -13,47 +13,44 @@
 using namespace std;
 
 class Solution {
-    bool isPalindrome(string s, int i, int len)
+    bool isPalindrome(string s, int l, int r)
     {
-        int l = i, r = i+len-1;
-        
         while(l <= r)
         {
-            if(s[l] != s[r])
+            if(s[l++] != s[r--])
                 return false;
-            
-            l++;
-            r--;
         }
         return true;
+    }
+    
+    void getPalinSubstrings(string &s, int index, vector<string> &cur, vector<vector<string>> &res)
+    {
+        for(int i = index; i < s.length();i++)
+        {
+            if(isPalindrome(s, index, i))
+            {
+                cur.push_back(s.substr(index, i-index+1));
+                if(i == s.length()-1)
+                {
+                    res.push_back(cur);
+                }
+                else
+                {
+                    getPalinSubstrings(s, i+1, cur, res);
+                }
+                cur.pop_back();
+            }
+        }
     }
 public:
     vector<vector<string>> partition(string s)
     {
-        int l = s.length();
-        unordered_map<int, vector<vector<string>>> M;
-        M[-1] = {{}};
-        for(int i = 0;i<l;i++)
-        {
-            vector<vector<string>> res;
-            for(int j = 1;j<=i+1;j++)
-            {
-                if(isPalindrome(s, i-j+1, j)) //string, index, length
-                {
-                    vector<vector<string>> prev = M[i-j];
-                    for(vector<string> v_prev : prev)
-                    {
-                        vector<string> v = v_prev;
-                        v.push_back(s.substr(i-j+1,j));
-                        res.push_back(v);
-                    }
-                }
-            }
-            
-            M[i] = res;
-            
-        }
-        return M[l-1];
+        vector<string> curr;
+        vector<vector<string>> res;
+        
+        getPalinSubstrings(s, 0, curr, res);
+        
+        return res;
     }
 };
 
