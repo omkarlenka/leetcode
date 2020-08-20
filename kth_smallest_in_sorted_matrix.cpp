@@ -7,89 +7,76 @@
 
 #include <iostream>
 #include <vector>
+#include <queue>
 
 using namespace std;
 
-class Solution {
+class Element
+{
+    int val,row,col;
 public:
-    int kthSmallest(vector<vector<int>>& matrix, int k)
+    Element(int val, int row, int col)
     {
-        int row = matrix.size();
-        int col = matrix[0].size();
-        int res = matrix[0][0];
-        
-        if(k == 1)
-            return res;
-        
-        pair<int,int> down = make_pair(1,0);
-        pair<int,int> right = make_pair(0,1);
-        k--;
-        
-        while(k--)
-        {
-            if(down.first != -1 && right.first != -1)
-            {
-                if(matrix[down.first][down.second] < matrix[right.first][right.second])
-                {
-                    res = matrix[down.first][down.second];
-                    if(down.first == row-1)
-                    {
-                        if(right.second - down.second > 1)
-                            down = make_pair(down.first, down.second+1);
-                        else
-                            down = make_pair(-1,-1);
-                    }
-                    else
-                    {
-                        down = make_pair(down.first+1, down.second);
-                    }
-                }
-                else
-                {
-                    res = matrix[right.first][right.second];
-                    if(right.second == col-1)
-                    {
-                        if(down.first - right.first > 1)
-                            right = make_pair(right.first+1, right.second);
-                        else
-                            right = make_pair(-1,-1);
-                    }
-                    else
-                    {
-                        right = make_pair(right.first, right.second+1);
-                    }
-                }
-            }
-            else if(down.first == -1)
-            {
-                res = matrix[right.first][right.second];
-                if(right.first < row-1)
-                    down = make_pair(right.first+1,right.second);
-                if(right.second < col-1)
-                    right = make_pair(right.first, right.second+1);
-                else
-                    right = make_pair(-1,-1);
-                
-            }
-            else
-            {
-                res = matrix[down.first][down.second];
-                if(down.second < col-1)
-                    right = make_pair(down.first, down.second+1);
-                if(down.first < row-1)
-                    down = make_pair(down.first+1, down.second);
-                else
-                    down = make_pair(-1,-1);
-            }
-        }
-        return res;
+        this->val = val;
+        this->row = row;
+        this->col = col;
+    }
+    int getVal(){return val;}
+    int getRow(){return row;}
+    int getCol(){return col;}
+};
+class Compare
+{
+public:
+    bool operator()(Element *a, Element *b)
+    {
+        return a->getVal() > b->getVal();
     }
 };
 
+class Solution {
+    
+public:
+    int kthSmallest(vector<vector<int>>& matrix, int k)
+    {
+        size_t n = matrix.size();
+        vector<Element*> v(n);
+        
+        for(int j = 0;j<n;j++)
+        {
+            v[j] = new Element(matrix[0][j], 0, j);
+        }
+        
+        priority_queue<Element*, vector<Element*>, Compare> Q;
+        for(int i = 0;i<n;i++)
+        {
+            Q.push(v[i]);
+        }
+        
+        while(k>1)
+        {
+            Element* min_elem = Q.top();
+            Q.pop();
+            
+            int row = min_elem->getRow();
+            int col = min_elem->getCol();
+            if(row+1 < n)
+            {
+                Q.push(new Element(matrix[row+1][col],row+1,col));
+            }
+            else
+            {
+                Q.push(new Element(INT_MAX,-1,-1));
+            }
+            k--;
+        }
+        return Q.top()->getVal();
+    }
+};
 int main()
 {
     Solution S;
-    vector<vector<int>> matrix = {{1,5,9},{10,11,13},{12,13,15}};
-    cout << S.kthSmallest(matrix, 3) << endl;
+    vector<vector<int>> matrix = {{1,4,7,11,15},{2,5,8,12,19},{3,6,9,16,22},{10,13,14,17,24},{18,21,23,26,30}};
+    cout << S.kthSmallest(matrix, 7) << endl;
     return 0;
 }
