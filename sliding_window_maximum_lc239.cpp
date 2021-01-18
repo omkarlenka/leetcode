@@ -7,41 +7,23 @@
 
 #include <iostream>
 #include <vector>
-#include <queue>
+#include <set>
 
 using namespace std;
 
-template<typename T>
-class custom_priority_queue : public std::priority_queue<T, std::vector<T>>
-{
-public:
-    
-    bool remove(const T& value) {
-        auto it = std::find(this->c.begin(), this->c.end(), value);
-        if (it != this->c.end()) {
-            this->c.erase(it);
-//            std::make_heap(this->c.begin(), this->c.end(), this->comp);
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-};
 class Solution {
 public:
     vector<int> maxSlidingWindow(vector<int>& nums, int k) {
         vector<int> res;
+        multiset<int> S(nums.begin(), nums.begin()+k);
         int start = 0;
-        custom_priority_queue<int> pq;
-        for(int i = start;i<k;i++){
-            pq.push(nums[i]);
-        }
         while(start <= nums.size()-k){
-            int top = pq.top();
-            res.push_back(top);
-            pq.remove(nums[start]);
-            pq.push(nums[start+k]);
+            auto itr1 = S.rbegin();
+            res.push_back(*itr1);
+            auto itr2 = S.find(nums[start]);
+            S.erase(itr2);
+            if(start + k < nums.size())
+                S.insert(nums[start+k]);
             start++;
         }
         return res;
