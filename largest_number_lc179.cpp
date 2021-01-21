@@ -12,40 +12,31 @@ using namespace std;
 
 class Comparator{
 public:
-    bool operator()(const int &a, const int &b) const{
-        if(a == b)
-            return false;
-        
-        string sa = to_string(a);
-        string sb = to_string(b);
-        
-        bool res = false;
-        
-        if(sa+sb > sb+sa){
-            res = true;
-        }
-        else if(sa+sb < sb+sa){
-            res = false;
-        }
-        
-        return res;
+    bool operator()(const string &sa, const string &sb) const{
+        return (sa+sb > sb+sa);
     }
 };
 class Solution {
 public:
     string largestNumber(vector<int>& nums) {
-        sort(nums.begin(), nums.end(), Comparator());
-        string res;
+        vector<string> res;
         for(int n:nums){
-            res += to_string(n);
+            res.push_back(to_string(n));
         }
-        if(res[0] == '0'){
-            res.clear();
-            res = "0";
+        
+        sort(res.begin(), res.end(), Comparator());
+        string res_string;
+        for(string s:res){
+            res_string += s;
         }
-        return res;
+        if(res_string[0] == '0'){
+            res_string.clear();
+            res_string = "0";
+        }
+        return res_string;
     }
 };
+
 
 int main() {
     Solution S;
