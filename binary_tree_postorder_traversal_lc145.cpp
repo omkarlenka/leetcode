@@ -6,7 +6,7 @@
 //
 
 #include <iostream>
-#include  <vector>
+#include <vector>
 
 using namespace std;
 
@@ -22,17 +22,40 @@ using namespace std;
  * };
  */
 class Solution {
-    void postorderTraversalUtil(TreeNode* root, vector<int> &res){
-        if(root == NULL)
-            return;
-        postorderTraversalUtil(root->left, res);
-        postorderTraversalUtil(root->right, res);
-        res.push_back(root->val);
-    }
 public:
     vector<int> postorderTraversal(TreeNode* root) {
         vector<int> res;
-        postorderTraversalUtil(root, res);
+        if(root == NULL)
+            return res;
+        stack<TreeNode*> S;
+        S.push(root);
+        S.push(NULL);
+        if(root->right){
+            S.push(root->right);
+        }
+        if(root->left){
+            S.push(root->left);
+        }
+        
+        
+        while(!S.empty()){
+            TreeNode* top = S.top();
+            if(top == NULL){
+                S.pop();
+                TreeNode* top1 = S.top();
+                S.pop();
+                res.push_back(top1->val);
+            }
+            else{
+                S.push(NULL);
+                if(top->right){
+                    S.push(top->right);
+                }
+                if(top->left){
+                    S.push(top->left);
+                }
+            }
+        }
         return res;
     }
 };
